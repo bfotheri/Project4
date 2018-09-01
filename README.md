@@ -55,7 +55,7 @@ I then used the output `objectsPoints` and `corners` to compute the camera calib
 
 #### 1. Provide an example of a distortion-corrected image.
 
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
+The image below had the cv2.undistort() function applied to it as described in the process above:
 ![alt text][image8]
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
