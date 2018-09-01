@@ -16,12 +16,13 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/undistort_output.png "Undistorted"
-[image2]: ./test_images/test1.jpg "Road Transformed"
-[image3]: ./examples/binary_combo_example.jpg "Binary Example"
-[image4]: ./examples/warped_straight_lines.jpg "Warp Example"
-[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
+[image1]: ./output_images/UndistortedChessBoard.jpg "Undistorted"
+[image2]: ./output_images/distortedChessBoard.jpg "Distorted"
+[image3]: ./output_images/SaturationColorChannel.jpg "Saturation Channel"
+[image4]: ./output_images/RedColorChannel.jpg "Red Channel"
+[image5]: ./output_images/perspectiveTransform.jpg "Perspective Transform"
+[image6]: ./output_images/polyfitlines.jpg "Polynomial Picture"
+[image7]: ./output_images/finalResult.jpg "Result"
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
@@ -44,9 +45,10 @@ The code for this step is contained in the second code cell of the jupyter noteb
 
 I start by generating "objectPoints", which are the assumed (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each chessboard calibration Image.  Thus, `objectPoints` is just a replicated array of coordinates, and will be appended with a copy of it every time all the chessboard corners are detected in a test image.  `corners`, which represent each intersection of four squares on the chessboard, will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
 
-I then used the output `objectsPoints` and `corners` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result:
+I then used the output `objectsPoints` and `corners` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result, in the first image, from the second image:
 
 ![alt text][image1]
+![alt text][image2]
 
 ### Pipeline (single images)
 
@@ -57,55 +59,55 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+I used a combination of color  thresholds to generate a binary image for the left and right lane respectively shown below. The code can be found in cell 10 of 'AdvancedLaneFinding.ipynb'.
 
+### Left Lane Saturation Image
 ![alt text][image3]
+### Right Lane Red Channel Image
+![alt text][image4]
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `perspectiveTransform()`, appears in cells 6 and 7 or AdvancedLaneFinding.ipynb.  The `perspectiveTransform()` function takes as input an image (`img`). I chose to hardcode the source and destination points in the following manner:
 
 ```python
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
+src = np.float32([[15, 720],[560, 450],[720, 450],[1280, 720]])
+dst = np.float32([[0, 720],[0, 0],[1280, 0],[1280, 720]])
 ```
 
 This resulted in the following source and destination points:
 
 | Source        | Destination   |
 |:-------------:|:-------------:|
-| 585, 460      | 320, 0        |
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+| 15, 720      | 0, 720        |
+| 560, 450      | 0, 0      |
+| 720, 450     | 1280, 0      |
+| 1280, 720      | 1280, 720        |
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
 
-![alt text][image4]
-
-#### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
-
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
-
 ![alt text][image5]
+
+#### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial
+
+In cell 5 of 'AdvancedLaneFinding.ipynb' using find_lane_pixels(), the pixels were identified using a sliding windows approach. First, a histogram of the lower half of the image was constructed to determine the starting windows locations for the 
+left and right cell. The next windows location is then changed based on the mean location of the pixels within the preceeding window. The pixels locations are then used to produce the second-order polynomial coefficients using the np.polyfit function. 
+These lines are then plotted on top of the image as seen below.
+
+![alt text][image6]
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
+
+In cell 14 of 'AdvancedLaneFinding.ipynb', I measure both the curvature of the lane and position of the vehicle with respect to center. The latter is calculated by taking the left and right lane coordinates at the
+bottom of the image and averaging them, then subtracting them from half the width of the image. This left the measurement in pixel units which was then changed to meters by multiplying the number of pixels by the spatial
+conversion factor. The radius of curvature was calculated using similar converions from pixelspace to meters and using the formula R=[1+(y′(x))^2]*32.
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+I implemented this final pipeline in the process_image() function in cell 16 of AdvancedLaneFinding.ipynb.
 
-![alt text][image6]
+![alt text][image7]
 
 ---
 
@@ -113,7 +115,7 @@ I implemented this step in lines # through # in my code in `yet_another_file.py`
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./final_output_video.mp4)
 
 ---
 
@@ -121,4 +123,6 @@ Here's a [link to my video result](./project_video.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+The principle problem faced in the implementation of the project involved the binary images produced through the thresholding function. I experimented with various values, tested different functions based
+on the average color values of the images, but all the combinations had parts of the video that they struggled with. In the end, this is the pipelines downfall in terms of robustness. In order to solve the problem
+an approach to take would be using the sobel operator rather than color channels or a combination of both to detect the pixels where the lane markings exist.
