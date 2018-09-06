@@ -23,6 +23,7 @@ The goals / steps of this project are the following:
 [image5]: ./output_images/perspectiveTransform.jpg "Perspective Transform"
 [image6]: ./output_images/polyfitlines.jpg "Polynomial Picture"
 [image7]: ./output_images/finalResult.jpg "Result"
+[image8]: ./output_images/calibratedImage.jpg "Calibrated Image"
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
@@ -48,7 +49,7 @@ I start by generating "objectPoints", which are the assumed (x, y, z) coordinate
 I then used the output `objectsPoints` and `corners` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result, in the first image, from the second image:
 
 ![alt text][image1]
-![alt text][image2]
+![alt text][image8]
 
 ### Pipeline (single images)
 
@@ -124,4 +125,4 @@ Here's a [link to my video result](./final_output_video.mp4)
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
 The principle problem faced in the implementation of the project involved the binary images produced through the thresholding function. I experimented with various values, tested different functions that relied on the average color values of the images, but all the combinations had parts of the video that they struggled with. In the end, this is the pipelines major barrier to robustness. In order to solve the problem
-an approach to take would be using the sobel operator rather than color channels or a combination of both to detect the pixels where the lane markings exist. This would allow the pipeline to be applied to a variety of environments. 
+an approach to take would be using the sobel operator rather than color channels or a combination of both to detect the pixels where the lane markings exist. This would allow the pipeline to be applied to a variety of environments.
